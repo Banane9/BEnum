@@ -11,8 +11,12 @@ namespace BEnum
     {
         private static readonly Type enumType = typeof(TEnum);
         private static readonly Lazy<Dictionary<string, TEnum>> nameIndex = new Lazy<Dictionary<string, TEnum>>(getNameIndex, LazyThreadSafetyMode.ExecutionAndPublication);
+        private static readonly Lazy<Dictionary<TEnum, string>> revNameIndex = new Lazy<Dictionary<TEnum, string>>(getRevNameIndex, LazyThreadSafetyMode.ExecutionAndPublication);
+
         private static readonly Lazy<Dictionary<long, TEnum>> valueIndex = new Lazy<Dictionary<long, TEnum>>(getValueIndex, LazyThreadSafetyMode.ExecutionAndPublication);
+
         private static Func<long, TEnum> makeInstance;
+
         private readonly long value;
 
         public static Func<long, TEnum> InstanceFactory
@@ -36,6 +40,9 @@ namespace BEnum
 
         public static explicit operator BEnum<TEnum>(long value)
             => getInstance(value);
+
+        public static explicit operator BEnum<TEnum>(string name)
+            => Parse(name);
 
         public static explicit operator long(BEnum<TEnum> bEnum)
             => bEnum.value;
@@ -65,27 +72,50 @@ namespace BEnum
             => !(left is null) && (left.Equals(right) || right is null);
 
         public static TEnum Parse(string name)
-            => nameIndex.Value.ContainsKey(name) ? nameIndex.Value[name] : throw new FormatException("Invalid name of enumeration member.");
+            => TryParse(name, out var instance) ? instance : throw new FormatException("Invalid name of enumeration member.");
 
         public static bool TryParse(string name, out TEnum instance)
         {
             instance = null;
+            var flagsName = name.StartsWith("[") && name.EndsWith("]");
 
-            if (!nameIndex.Value.ContainsKey(name))
+            if (!nameIndex.Value.ContainsKey(name) && !flagsName)
                 return false;
 
-            instance = nameIndex.Value[name];
+            var parts = flagsName ? name.Substring(1, name.Length - 2).Split(new[] { ", " }, StringSplitOptions.None) : new[] { name };
+            instance = nameIndex.Value[parts[0]];
+            foreach (var part in parts.Skip(1))
+            {
+                if (!nameIndex.Value.ContainsKey(part))
+                    return false;
+
+                instance |= nameIndex.Value[part];
+            }
+
             return true;
         }
 
         public override bool Equals(object obj)
             => obj is BEnum<TEnum> bEnum && bEnum.value == value;
 
+        public IEnumerable<TEnum> GetFlags()
+            => nameIndex.Value.Values.Where(value => HasFlag(value));
+
         public override int GetHashCode()
             => value.GetHashCode();
 
         public bool HasFlag(TEnum other)
             => (other.value & value) != 0;
+
+        public override string ToString()
+        {
+            var flags = GetFlags().ToArray();
+
+            if (flags.Length == 1)
+                return revNameIndex.Value[flags[0]];
+
+            return $"[{string.Join(", ", flags.Select(flag => revNameIndex.Value[flag]))}]";
+        }
 
         protected static void SetInstanceFactory(Func<long, TEnum> instanceFactory)
         {
@@ -109,6 +139,10 @@ namespace BEnum
         private static Dictionary<string, TEnum> getNameIndex()
             => getFields()
                 .ToDictionary(field => field.Name, field => (TEnum)field.GetValue(null), StringComparer.InvariantCultureIgnoreCase);
+
+        private static Dictionary<TEnum, string> getRevNameIndex()
+                                                                                                                                                                                                                            => getFields()
+                .ToDictionary(field => (TEnum)field.GetValue(null), field => field.Name);
 
         private static Dictionary<long, TEnum> getValueIndex()
             => getFields()

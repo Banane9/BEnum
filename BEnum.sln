@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BEnum", "BEnum\BEnum.csproj", "{EB7C60E2-A90C-4F52-BD35-9F19968EED5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BEnum.Example", "BEnum.Example\BEnum.Example.csproj", "{90AD9BDF-BA58-4AEC-931A-9949043D7F5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{EB7C60E2-A90C-4F52-BD35-9F19968EED5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB7C60E2-A90C-4F52-BD35-9F19968EED5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB7C60E2-A90C-4F52-BD35-9F19968EED5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90AD9BDF-BA58-4AEC-931A-9949043D7F5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90AD9BDF-BA58-4AEC-931A-9949043D7F5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90AD9BDF-BA58-4AEC-931A-9949043D7F5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90AD9BDF-BA58-4AEC-931A-9949043D7F5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
