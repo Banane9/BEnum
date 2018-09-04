@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace BEnum.Example
@@ -12,18 +13,20 @@ namespace BEnum.Example
         public static readonly Weekdays Thursday = new Weekdays(8, 3, false);
         public static readonly Weekdays Tuesday = new Weekdays(2, 1, false);
         public static readonly Weekdays Wednesday = new Weekdays(4, 2, false);
+        public static readonly Weekdays Weekend = new Weekdays(32 | 64, -1, true);
 
         public bool IsWeekend { get; }
 
         public int Number { get; }
 
-        static Weekdays()
+        private Weekdays(ulong value)
+                    : base(value)
         {
-            SetInstanceFactory(value => new Weekdays(value, -1, false));
+            IsWeekend = GetFlags(false).All(day => day.IsWeekend);
         }
 
-        private Weekdays(long value, int number, bool isWeekend)
-                                    : base(value)
+        private Weekdays(ulong value, int number, bool isWeekend)
+            : base(value)
         {
             Number = number;
             IsWeekend = isWeekend;
